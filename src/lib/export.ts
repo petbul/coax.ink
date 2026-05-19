@@ -43,11 +43,21 @@ export async function exportPdf(element: HTMLElement, source: string, deleted: S
 async function renderPng(element: HTMLElement): Promise<string> {
   const { toPng } = await import('html-to-image');
   const rect = element.getBoundingClientRect();
-  const ratio = Math.max(2, MIN_WIDTH / Math.max(rect.width, 1));
+  // Render with a margin of cream space around the redaction. html-to-image
+  // computes the SVG viewport from the dimensions we pass, then applies our
+  // style overrides to the cloned node; we must declare both ourselves or the
+  // viewport is sized to the original (unpadded) element and clips the last
+  // line of glyphs.
+  const pad = 48;
+  const targetWidth = rect.width + pad * 2;
+  const targetHeight = rect.height + pad * 2;
+  const ratio = Math.max(2, MIN_WIDTH / Math.max(targetWidth, 1));
   return toPng(element, {
     pixelRatio: ratio,
     backgroundColor: '#FAF7F2',
-    style: { padding: '48px' },
+    width: targetWidth,
+    height: targetHeight,
+    style: { padding: `${pad}px`, boxSizing: 'content-box' },
   });
 }
 
