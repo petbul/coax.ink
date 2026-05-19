@@ -11,10 +11,10 @@ export function Home({ onBegin }: { onBegin: (source: string) => void }) {
     <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-[640px]">
         <header className="mb-12 text-center">
-          <h1 className="font-serif italic text-2xl md:text-3xl tracking-tight text-ink">
+          <h1 className="font-serif text-2xl md:text-3xl tracking-tight bg-gradient-to-r from-ink to-ink/10 bg-clip-text text-transparent">
             coax.ink
           </h1>
-          <p className="mt-3 font-serif italic text-base md:text-lg text-ink/65">
+          <p className="mt-3 font-serif text-base md:text-lg text-ink/65">
             Coax a poem from any text.
           </p>
         </header>
@@ -24,19 +24,19 @@ export function Home({ onBegin }: { onBegin: (source: string) => void }) {
           onChange={(e) => setText(e.target.value.slice(0, MAX_LEN))}
           placeholder="Paste anything. A speech, a contract, a recipe, a letter."
           spellCheck={false}
-          className="w-full min-h-[40vh] bg-transparent font-serif text-[19px] leading-[1.7] text-ink placeholder:text-ink/40 placeholder:italic outline-none resize-none"
+          className="w-full min-h-[40vh] bg-transparent font-serif text-[19px] leading-[1.7] text-ink placeholder:text-ink/40 outline-none resize-none"
           aria-label="Source text"
         />
 
         <div className="mt-8 flex items-center justify-between">
-          <span className="font-serif italic text-sm text-ink/40">
+          <span className="font-serif text-sm text-ink/40">
             {text.length > 0 ? `${text.length.toLocaleString()} / ${MAX_LEN.toLocaleString()}` : ''}
           </span>
           <button
             type="button"
             onClick={() => canBegin && onBegin(trimmed)}
             disabled={!canBegin}
-            className="font-serif italic text-lg text-ink underline decoration-ink/30 underline-offset-[6px] hover:decoration-ink disabled:text-ink/30 disabled:no-underline disabled:cursor-default transition-colors"
+            className="font-serif text-lg text-ink underline decoration-ink/30 underline-offset-[6px] hover:decoration-ink disabled:text-ink/30 disabled:no-underline disabled:cursor-default transition-colors"
           >
             Begin
           </button>
