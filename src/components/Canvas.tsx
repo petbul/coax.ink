@@ -6,6 +6,7 @@ export type CanvasProps = {
   deleted: Set<number>;
   onToggle: (eraseIndex: number) => void;
   onReset: () => void;
+  onBeginAgain: () => void;
   onShare: () => void;
   onExport: () => void;
   onPdf: () => void;
@@ -18,6 +19,7 @@ export function Canvas({
   deleted,
   onToggle,
   onReset,
+  onBeginAgain,
   onShare,
   onExport,
   onPdf,
@@ -28,9 +30,17 @@ export function Canvas({
 
   return (
     <main className="min-h-dvh flex flex-col items-center px-6 py-16">
+      <button
+        type="button"
+        onClick={onBeginAgain}
+        aria-label="Begin again with new text"
+        className="self-start font-serif italic text-sm text-ink/40 hover:text-ink/70 transition-colors mb-10"
+      >
+        coax.ink
+      </button>
       <article
         id="coax-canvas"
-        className="canvas w-full max-w-[640px] font-serif text-[19px] leading-[1.7] text-ink whitespace-pre-wrap"
+        className="w-full max-w-[640px] font-serif text-[19px] leading-[1.7] text-ink whitespace-pre-wrap"
       >
         {tokens.map((t, i) => {
           if (t.kind === 'space') {
@@ -45,7 +55,7 @@ export function Canvas({
               aria-pressed={isDeleted}
               aria-label={isDeleted ? `Restore ${t.text}` : `Remove ${t.text}`}
               className={
-                'p-0 m-0 bg-transparent border-0 font-serif text-[inherit] leading-[inherit] align-baseline cursor-text transition-colors focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ' +
+                'p-0 m-0 bg-transparent border-0 font-serif text-[inherit] leading-[inherit] align-baseline cursor-default transition-colors focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ' +
                 (isDeleted
                   ? 'text-transparent selection:bg-transparent'
                   : 'text-ink hover:text-ink/55')
@@ -57,7 +67,7 @@ export function Canvas({
         })}
       </article>
 
-      <footer className="no-print mt-16 mb-8 w-full max-w-[640px] flex flex-wrap justify-center gap-x-8 gap-y-3 font-serif italic text-sm text-ink/55">
+      <footer className="mt-16 mb-8 w-full max-w-[640px] flex flex-wrap justify-center gap-x-8 gap-y-3 font-serif italic text-sm text-ink/55">
         <button type="button" onClick={onReset} className="hover:text-ink transition-colors">
           Reset
         </button>

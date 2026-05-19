@@ -52,6 +52,14 @@ export default function App() {
     setDeleted(new Set());
   }, []);
 
+  const handleBeginAgain = useCallback(() => {
+    setSource(null);
+    setDeleted(new Set());
+    setShareLabel('Share');
+    setPdfLabel('PDF');
+    window.history.replaceState(null, '', window.location.pathname);
+  }, []);
+
   const handleShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -94,6 +102,7 @@ export default function App() {
       deleted={deleted}
       onToggle={handleToggle}
       onReset={handleReset}
+      onBeginAgain={handleBeginAgain}
       onShare={handleShare}
       onExport={handleExport}
       onPdf={handlePdf}
