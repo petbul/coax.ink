@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type PointerEvent } from 'react';
 
 const MAX_LEN = 10_000;
 
@@ -7,8 +7,21 @@ export function Home({ onBegin }: { onBegin: (source: string) => void }) {
   const trimmed = text.trim();
   const canBegin = trimmed.length > 0;
 
+  // On mobile, tapping outside the textarea should dismiss the keyboard. iOS
+  // Safari doesn't do this on its own — we have to blur the focused element
+  // explicitly when the user taps anywhere that isn't the textarea or a button.
+  const handleBackdropPointerDown = (e: PointerEvent<HTMLElement>) => {
+    const target = e.target as Element;
+    if (target.closest('textarea, button')) return;
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  };
+
   return (
-    <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-16">
+    <main
+      onPointerDown={handleBackdropPointerDown}
+      className="min-h-dvh flex flex-col items-center justify-center px-6 py-16"
+    >
       <div className="w-full max-w-[640px]">
         <header className="mb-12 text-center">
           <h1 className="inline-block font-serif text-2xl md:text-3xl tracking-tight bg-gradient-to-r from-ink to-ink/[0.03] bg-clip-text text-transparent">
