@@ -11,7 +11,7 @@ export function Home({ onBegin }: { onBegin: (source: string) => void }) {
     <main className="min-h-dvh flex flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-[640px]">
         <header className="mb-12 text-center">
-          <h1 className="font-serif text-2xl md:text-3xl tracking-tight bg-gradient-to-r from-ink to-ink/10 bg-clip-text text-transparent">
+          <h1 className="font-serif text-2xl md:text-3xl tracking-tight bg-gradient-to-r from-ink to-ink/[0.03] bg-clip-text text-transparent">
             coax.ink
           </h1>
           <p className="mt-3 font-serif text-base md:text-lg text-ink/65">
