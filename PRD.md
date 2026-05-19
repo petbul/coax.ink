@@ -40,9 +40,10 @@ the text; the user's job is to coax it out.
 
 ### Tokenization
 - Split source into tokens: words, whitespace, punctuation.
-- Word-level granularity — each word is a single toggleable unit. Whitespace
-  and punctuation are not interactive.
-- Trailing punctuation stays attached to its word ("house," is one token).
+- Words are runs of letters and digits. Whitespace is inert structure.
+- Every other character — comma, period, hyphen, quote, em-dash, apostrophe,
+  even the inner mark in "don't" or "well-known" — is its own erasable token.
+  Each mark can be removed or kept independently of the words around it.
 
 ### Interaction
 - Click a word to delete it. The word becomes blank space the width it
@@ -65,7 +66,9 @@ Four controls only, rendered as text links at the bottom:
 - **Reset** — restores all words.
 - **Share** — copies the current state's URL to clipboard.
 - **Export** — downloads a PNG of the current redaction.
-- **Print** — triggers the browser print dialog.
+- **PDF** — downloads a single-page PDF of the redaction. We generate the PDF
+  ourselves rather than calling `window.print()` so the output has no browser
+  chrome — no URL header, no page-number footer.
 
 ### Sharing
 - Source text + deletion mask encoded into the URL via `lz-string`.
@@ -76,11 +79,11 @@ Four controls only, rendered as text links at the bottom:
 - PNG via `html-to-image` at 2x pixel ratio, minimum 1200px wide.
 - Filename: `coax-{first-three-surviving-words}.png` or `coax-redaction.png`.
 
-### Print
-- All UI chrome hidden via `@media print`.
-- Background switches to pure white.
-- ~25mm page margins. `widows: 3; orphans: 3`.
-- Single column layout preserved.
+### PDF
+- Rendered client-side via `html-to-image` → `pdf-lib`.
+- Single-page PDF sized to the redaction's natural footprint.
+- Cream background preserved (the artifact carries its own paper).
+- Lazy-loaded chunk — `pdf-lib` only ships if the user requests a PDF.
 
 ## Out of scope for v1
 
@@ -112,8 +115,9 @@ MIT-licensed and public from day one.
 5. Share copies a URL with brief inline confirmation.
 6. Opening a shared URL renders the exact same redaction.
 7. Recipient can continue redacting from the shared state.
-8. Export downloads a PNG matching the screen at 2x resolution.
-9. Print produces clean output: no chrome, white background, preserved layout.
+8. Export downloads a PNG matching the screen at 2× resolution.
+9. PDF downloads a single-page document carrying only the redaction —
+   no browser-added URL header, page number, or footer.
 10. Works on mobile Safari and desktop Chrome.
 11. No network requests after page load except fonts.
 

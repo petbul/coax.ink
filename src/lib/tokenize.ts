@@ -1,28 +1,27 @@
 export type Token =
-  | { kind: 'word'; text: string; wordIndex: number }
-  | { kind: 'space'; text: string }
-  | { kind: 'punct'; text: string };
+  | { kind: 'word'; text: string; eraseIndex: number }
+  | { kind: 'punct'; text: string; eraseIndex: number }
+  | { kind: 'space'; text: string };
 
-const WORD_START = /[\p{L}\p{N}]/u;
-const WORD_INTERNAL = /[\p{L}\p{N}'’\-]/u;
-const TRAILING_PUNCT = /[.,;:!?)\]"”’]/u;
+const WORD_CHAR = /[\p{L}\p{N}]/u;
 const SPACE = /\s/;
 
 /**
  * Splits source into word, space, and punctuation tokens.
  *
- * Words use Unicode letters and digits. Apostrophes and hyphens are word-internal
- * (so "don't" and "well-known" are single words). Trailing punctuation attaches
- * to its word (so "house," and "Hello!" are single tokens). Anything else —
- * leading quotes, em-dashes, standalone symbols — becomes its own punct token.
+ * Words are runs of Unicode letters and digits. Whitespace runs are inert.
+ * Every other character — comma, period, hyphen, quote, em-dash, apostrophe,
+ * even the inner mark in "don't" or "well-known" — becomes its own erasable
+ * token. This gives the poet full control over which marks survive.
  *
- * Word tokens get a stable wordIndex matching their position in the deletion mask.
+ * Word and punct tokens share a single eraseIndex sequence — the deletion
+ * mask is one bit per erasable token in document order.
  */
 export function tokenize(source: string): Token[] {
   const tokens: Token[] = [];
   const n = source.length;
   let i = 0;
-  let wordIndex = 0;
+  let eraseIndex = 0;
 
   while (i < n) {
     const c = source[i]!;
@@ -35,30 +34,24 @@ export function tokenize(source: string): Token[] {
       continue;
     }
 
-    if (WORD_START.test(c)) {
+    if (WORD_CHAR.test(c)) {
       let j = i + 1;
-      while (j < n && WORD_INTERNAL.test(source[j]!)) j++;
-      // Strip dangling apostrophes/hyphens that aren't followed by another letter.
-      while (j > i + 1 && /['’\-]/.test(source[j - 1]!)) j--;
-      // Attach trailing punctuation up to whitespace.
-      while (j < n && TRAILING_PUNCT.test(source[j]!)) j++;
-      tokens.push({ kind: 'word', text: source.slice(i, j), wordIndex: wordIndex++ });
+      while (j < n && WORD_CHAR.test(source[j]!)) j++;
+      tokens.push({ kind: 'word', text: source.slice(i, j), eraseIndex: eraseIndex++ });
       i = j;
       continue;
     }
 
-    // Non-word, non-space: standalone punctuation run.
-    let j = i + 1;
-    while (j < n && !SPACE.test(source[j]!) && !WORD_START.test(source[j]!)) j++;
-    tokens.push({ kind: 'punct', text: source.slice(i, j) });
-    i = j;
+    // Every other character is its own punct token.
+    tokens.push({ kind: 'punct', text: c, eraseIndex: eraseIndex++ });
+    i++;
   }
 
   return tokens;
 }
 
-export function countWords(tokens: Token[]): number {
+export function countErasable(tokens: Token[]): number {
   let count = 0;
-  for (const t of tokens) if (t.kind === 'word') count++;
+  for (const t of tokens) if (t.kind !== 'space') count++;
   return count;
 }

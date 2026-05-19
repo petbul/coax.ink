@@ -4,12 +4,13 @@ import { tokenize } from '../lib/tokenize';
 export type CanvasProps = {
   source: string;
   deleted: Set<number>;
-  onToggle: (wordIndex: number) => void;
+  onToggle: (eraseIndex: number) => void;
   onReset: () => void;
   onShare: () => void;
   onExport: () => void;
-  onPrint: () => void;
+  onPdf: () => void;
   shareLabel: string;
+  pdfLabel: string;
 };
 
 export function Canvas({
@@ -19,8 +20,9 @@ export function Canvas({
   onReset,
   onShare,
   onExport,
-  onPrint,
+  onPdf,
   shareLabel,
+  pdfLabel,
 }: CanvasProps) {
   const tokens = useMemo(() => tokenize(source), [source]);
 
@@ -31,27 +33,27 @@ export function Canvas({
         className="canvas w-full max-w-[640px] font-serif text-[19px] leading-[1.7] text-ink whitespace-pre-wrap"
       >
         {tokens.map((t, i) => {
-          if (t.kind === 'word') {
-            const isDeleted = deleted.has(t.wordIndex);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onToggle(t.wordIndex)}
-                aria-pressed={isDeleted}
-                aria-label={isDeleted ? `Restore ${t.text}` : `Remove ${t.text}`}
-                className={
-                  'p-0 m-0 bg-transparent border-0 font-serif text-[inherit] leading-[inherit] align-baseline cursor-text transition-colors focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ' +
-                  (isDeleted
-                    ? 'text-transparent selection:bg-transparent'
-                    : 'text-ink hover:text-ink/55')
-                }
-              >
-                {t.text}
-              </button>
-            );
+          if (t.kind === 'space') {
+            return <span key={i}>{t.text}</span>;
           }
-          return <span key={i}>{t.text}</span>;
+          const isDeleted = deleted.has(t.eraseIndex);
+          return (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onToggle(t.eraseIndex)}
+              aria-pressed={isDeleted}
+              aria-label={isDeleted ? `Restore ${t.text}` : `Remove ${t.text}`}
+              className={
+                'p-0 m-0 bg-transparent border-0 font-serif text-[inherit] leading-[inherit] align-baseline cursor-text transition-colors focus:outline-none focus-visible:underline focus-visible:underline-offset-4 ' +
+                (isDeleted
+                  ? 'text-transparent selection:bg-transparent'
+                  : 'text-ink hover:text-ink/55')
+              }
+            >
+              {t.text}
+            </button>
+          );
         })}
       </article>
 
@@ -65,8 +67,8 @@ export function Canvas({
         <button type="button" onClick={onExport} className="hover:text-ink transition-colors">
           Export
         </button>
-        <button type="button" onClick={onPrint} className="hover:text-ink transition-colors">
-          Print
+        <button type="button" onClick={onPdf} className="hover:text-ink transition-colors">
+          {pdfLabel}
         </button>
       </footer>
     </main>

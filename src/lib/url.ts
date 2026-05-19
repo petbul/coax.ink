@@ -4,11 +4,11 @@ import LZString from 'lz-string';
  * Encodes the source text and deletion mask into a single URL-safe string.
  *
  * The payload is JSON of shape { s: source, m: base64(packed bitmask) }, then
- * compressed with lz-string. Mask is a bit-array indexed by wordIndex, packed
+ * compressed with lz-string. Mask is a bit-array indexed by eraseIndex, packed
  * little-endian: bit (i & 7) of byte (i >> 3).
  */
-export function encodeState(source: string, deleted: Set<number>, wordCount: number): string {
-  const m = packMask(deleted, wordCount);
+export function encodeState(source: string, deleted: Set<number>, erasableCount: number): string {
+  const m = packMask(deleted, erasableCount);
   const payload = JSON.stringify({ s: source, m });
   return LZString.compressToEncodedURIComponent(payload);
 }
@@ -26,11 +26,11 @@ export function decodeState(r: string): { source: string; deleted: Set<number> }
   }
 }
 
-function packMask(deleted: Set<number>, wordCount: number): string {
-  if (wordCount === 0) return '';
-  const bytes = new Uint8Array(Math.ceil(wordCount / 8));
+function packMask(deleted: Set<number>, erasableCount: number): string {
+  if (erasableCount === 0) return '';
+  const bytes = new Uint8Array(Math.ceil(erasableCount / 8));
   for (const i of deleted) {
-    if (i < 0 || i >= wordCount) continue;
+    if (i < 0 || i >= erasableCount) continue;
     bytes[i >> 3]! |= 1 << (i & 7);
   }
   return bytesToBase64(bytes);

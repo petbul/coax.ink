@@ -18,7 +18,7 @@ describe('url state', () => {
     expect(Array.from(decoded?.deleted ?? []).sort((a, b) => a - b)).toEqual([0, 3, 5, 9]);
   });
 
-  it('handles wordCount > 8 (multi-byte mask)', () => {
+  it('handles erasableCount > 8 (multi-byte mask)', () => {
     const deleted = new Set([0, 8, 15, 16, 23]);
     const encoded = encodeState('source', deleted, 24);
     const decoded = decodeState(encoded);
